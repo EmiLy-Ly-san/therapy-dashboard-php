@@ -1,0 +1,86 @@
+services:
+  # -------------------------------------------------------
+  # Serveurs PHP
+  # -------------------------------------------------------
+  php84:
+    build: ./docker/php84
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  php85:
+    build: ./docker/php85
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  # -------------------------------------------------------
+  # Serveurs Web
+  # -------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8090:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php84
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "8091:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - php85
+    restart: unless-stopped
+
+  # -------------------------------------------------------
+  # Bases de données
+  # -------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecv
+      MYSQL_USER: ecv
+      MYSQL_PASSWORD: ecv
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  # -------------------------------------------------------
+  # Clients BDD
+  # -------------------------------------------------------
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8092:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8093:8080"
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
