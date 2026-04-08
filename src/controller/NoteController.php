@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Note;
 use App\Repository\NoteRepository;
 
 class NoteController
@@ -39,15 +40,18 @@ class NoteController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
-            $isShared = isset($_POST['is_shared']) ? 1 : 0;
+            $isShared = isset($_POST['is_shared']);
 
             if ($title !== '' && $content !== '') {
-                $this->repository->save([
-                    'user_id' => 1,
-                    'title' => $title,
-                    'content' => $content,
-                    'is_shared' => $isShared,
-                ]);
+                $note = new Note(
+                    null,
+                    1,
+                    $title,
+                    $content,
+                    $isShared
+                );
+
+                $this->repository->save($note);
 
                 header('Location: index.php?page=notes&action=list');
                 exit;
@@ -70,14 +74,18 @@ class NoteController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
-            $isShared = isset($_POST['is_shared']) ? 1 : 0;
+            $isShared = isset($_POST['is_shared']);
 
             if ($title !== '' && $content !== '') {
-                $this->repository->edit($id, [
-                    'title' => $title,
-                    'content' => $content,
-                    'is_shared' => $isShared,
-                ]);
+                $updatedNote = new Note(
+                    $id,
+                    (int) $note['user_id'],
+                    $title,
+                    $content,
+                    $isShared
+                );
+
+                $this->repository->update($updatedNote);
 
                 header('Location: index.php?page=notes&action=list');
                 exit;

@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Note;
+
 class NoteRepository
 {
-    public function __construct(private \PDO $pdo) {}
+    public function __construct(private \PDO $pdo)
+    {
+    }
 
     public function findAll(): array
     {
@@ -22,7 +26,7 @@ class NoteRepository
         return $stmt->fetch() ?: null;
     }
 
-    public function save(array $data): int
+    public function save(Note $note): int
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO notes (user_id, title, content, is_shared)
@@ -30,16 +34,16 @@ class NoteRepository
         );
 
         $stmt->execute([
-            'user_id' => $data['user_id'],
-            'title' => $data['title'],
-            'content' => $data['content'],
-            'is_shared' => $data['is_shared'],
+            'user_id' => $note->getUserId(),
+            'title' => $note->getTitle(),
+            'content' => $note->getContent(),
+            'is_shared' => $note->isShared() ? 1 : 0,
         ]);
 
         return (int) $this->pdo->lastInsertId();
     }
 
-    public function edit(int $id, array $data): void
+    public function update(Note $note): void
     {
         $stmt = $this->pdo->prepare(
             'UPDATE notes
@@ -50,10 +54,10 @@ class NoteRepository
         );
 
         $stmt->execute([
-            'id' => $id,
-            'title' => $data['title'],
-            'content' => $data['content'],
-            'is_shared' => $data['is_shared'],
+            'id' => $note->getId(),
+            'title' => $note->getTitle(),
+            'content' => $note->getContent(),
+            'is_shared' => $note->isShared() ? 1 : 0,
         ]);
     }
 
