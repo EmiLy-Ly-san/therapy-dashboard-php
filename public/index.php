@@ -9,7 +9,7 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config/database.php';
 
 use App\Controller\NoteController;
-
+use App\Controller\AuthController;
 
 // CSRF TOKEN
 
@@ -36,15 +36,15 @@ $id = (int) ($_GET['id'] ?? 0);
 // Connexion BDD
 $pdo = getConnection();
 
-// Instanciation du controller
-$controller = new NoteController($pdo);
-
 // Routage
 match ($page . '/' . $action) {
-    'notes/list'   => $controller->list(),
-    'notes/show'   => $controller->show($id),
-    'notes/create' => $controller->create(),
-    'notes/update' => $controller->update($id),
-    'notes/delete' => $controller->delete($id),
-    default        => http_response_code(404) && print('Page non trouvée'),
+    'notes/list'     => (new NoteController($pdo))->list(),
+    'notes/show'     => (new NoteController($pdo))->show($id),
+    'notes/create'   => (new NoteController($pdo))->create(),
+    'notes/update'   => (new NoteController($pdo))->update($id),
+    'notes/delete'   => (new NoteController($pdo))->delete($id),
+
+    'auth/register'  => (new AuthController($pdo))->register(),
+
+    default          => http_response_code(404) && print('Page non trouvée'),
 };
