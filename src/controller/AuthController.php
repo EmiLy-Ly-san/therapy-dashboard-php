@@ -18,7 +18,6 @@ class AuthController
     {
         $therapists = $this->userRepo->findTherapists();
 
-        // Affichage initial du formulaire
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $errors = [];
             $old = [];
@@ -28,7 +27,6 @@ class AuthController
 
         checkCsrf();
 
-        // Validation
         $errors = [];
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -52,7 +50,6 @@ class AuthController
             $errors['role'] = 'Rôle invalide';
         }
 
-        // Si l'utilisateur est patient, il doit choisir un therapist
         if ($role === 'patient') {
             if ($therapistId === '') {
                 $errors['therapist_id'] = 'Veuillez choisir un thérapeute';
@@ -61,12 +58,10 @@ class AuthController
             }
         }
 
-        // Vérifier email déjà utilisé
         if (empty($errors) && $this->userRepo->findByEmail($email)) {
             $errors['email'] = 'Cet email est déjà utilisé';
         }
 
-        // Sticky form
         $old = [
             'name' => $name,
             'email' => $email,
@@ -79,7 +74,6 @@ class AuthController
             return;
         }
 
-        // Hash mot de passe
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         $this->userRepo->create([
@@ -91,6 +85,70 @@ class AuthController
         ]);
 
         $_SESSION['flash'] = 'Inscription réussie ! Connectez-vous.';
+        header('Location: index.php?page=auth&action=login');
+        exit;
+    }
+
+    public function login(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $error = null;
+            $old = [];
+            require __DIR__ . '/../../view/auth/login.php';
+            return;
+        }
+
+        checkCsrf();
+
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        $user = $this->userRepo->findByEmail($email);
+
+        // Message volontairement vague
+        if (!$user || !password_verify($password, $user['password'])) {
+            $error = 'Email ou mot de passe incorrect';
+            $old = ['email' => $email];
+            require __DIR__ . '/../../view/auth/login.php';
+            return;
+        }
+
+        session_regenerate_id(true);
+
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['role'] = $user['role'];
+
+        // Redirection selon rôle
+        if ($user['role'] === 'therapist') {
+            header('Location: index.php?page=therapist&action=dashboard');
+            exit;
+        }
+
+        header('Location: index.php?page=notes&action=list');
+        exit;
+    }
+
+    public function logout(): void
+    {
+        $_SESSION = [];
+
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+
+            setcookie(
+                session_name(),
+                '',
+                time() - 3600,
+                $params['path'],
+                $params['domain'],
+                (bool) $params['secure'],
+                (bool) $params['httponly']
+            );
+        }
+
+        session_destroy();
+
         header('Location: index.php?page=auth&action=login');
         exit;
     }

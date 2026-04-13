@@ -45,6 +45,8 @@ match ($page . '/' . $action) {
     'notes/delete'   => (new NoteController($pdo))->delete($id),
 
     'auth/register'  => (new AuthController($pdo))->register(),
+    'auth/login'     => (new AuthController($pdo))->login(),
+    'auth/logout'    => (new AuthController($pdo))->logout(),
 
     default          => http_response_code(404) && print('Page non trouvée'),
 };
