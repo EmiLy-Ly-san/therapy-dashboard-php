@@ -38,7 +38,7 @@ class UserRepository
         return $user ?: null;
     }
 
-    /** Créer un utilisateur (register) */
+    /** Créer un utilisateur */
     public function create(array $data): void
     {
         $sql = "
@@ -51,13 +51,13 @@ class UserRepository
         $stmt->execute([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => $data['password'], // déjà hashé
+            'password' => $data['password'],
             'role' => $data['role'],
             'therapist_id' => $data['therapist_id'] ?? null,
         ]);
     }
 
-    /** Récupérer tous les therapists (pour le formulaire d'inscription) */
+    /** Récupérer tous les therapists */
     public function findTherapists(): array
     {
         $sql = "SELECT id, name FROM users WHERE role = 'therapist' ORDER BY name";
@@ -66,7 +66,9 @@ class UserRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** Récupérer les patients d'un therapist */
+    /**
+     * Récupérer les patients d'un therapist
+     */
     public function findPatientsByTherapistId(int $therapistId): array
     {
         $sql = "
@@ -80,5 +82,28 @@ class UserRepository
         $stmt->execute(['therapist_id' => $therapistId]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /** Trouver un patient appartenant à un therapist */
+    public function findPatientByIdAndTherapistId(int $patientId, int $therapistId): ?array
+    {
+        $sql = "
+            SELECT id, name, email, therapist_id
+            FROM users
+            WHERE id = :patient_id
+              AND role = 'patient'
+              AND therapist_id = :therapist_id
+            LIMIT 1
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'patient_id' => $patientId,
+            'therapist_id' => $therapistId,
+        ]);
+
+        $patient = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $patient ?: null;
     }
 }
