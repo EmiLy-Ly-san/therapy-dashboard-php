@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Note;
+use App\Helper\Auth;
 use App\Repository\NoteRepository;
 
 class NoteController
@@ -18,13 +19,20 @@ class NoteController
 
     public function list(): void
     {
-        $notes = $this->repository->findAll();
+        Auth::requireRole('patient');
+
+        $user = Auth::currentUser();
+        $notes = $this->repository->findAllByUserId((int) $user['id']);
+
         require __DIR__ . '/../../view/notes/list.php';
     }
 
     public function show(int $id): void
     {
-        $note = $this->repository->find($id);
+        Auth::requireRole('patient');
+
+        $user = Auth::currentUser();
+        $note = $this->repository->findByIdAndUserId($id, (int) $user['id']);
 
         if (!$note) {
             http_response_code(404);
@@ -37,7 +45,13 @@ class NoteController
 
     public function create(): void
     {
+        Auth::requireRole('patient');
+
+        $user = Auth::currentUser();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            checkCsrf();
+
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
             $isShared = isset($_POST['is_shared']);
@@ -45,7 +59,7 @@ class NoteController
             if ($title !== '' && $content !== '') {
                 $note = new Note(
                     null,
-                    1,
+                    (int) $user['id'],
                     $title,
                     $content,
                     $isShared
@@ -63,7 +77,10 @@ class NoteController
 
     public function update(int $id): void
     {
-        $note = $this->repository->find($id);
+        Auth::requireRole('patient');
+
+        $user = Auth::currentUser();
+        $note = $this->repository->findByIdAndUserId($id, (int) $user['id']);
 
         if (!$note) {
             http_response_code(404);
@@ -72,6 +89,8 @@ class NoteController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            checkCsrf();
+
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
             $isShared = isset($_POST['is_shared']);
@@ -79,7 +98,7 @@ class NoteController
             if ($title !== '' && $content !== '') {
                 $updatedNote = new Note(
                     $id,
-                    (int) $note['user_id'],
+                    (int) $user['id'],
                     $title,
                     $content,
                     $isShared
@@ -97,7 +116,10 @@ class NoteController
 
     public function delete(int $id): void
     {
-        $note = $this->repository->find($id);
+        Auth::requireRole('patient');
+
+        $user = Auth::currentUser();
+        $note = $this->repository->findByIdAndUserId($id, (int) $user['id']);
 
         if (!$note) {
             http_response_code(404);
@@ -105,7 +127,7 @@ class NoteController
             return;
         }
 
-        $this->repository->delete($id);
+        $this->repository->delete($id, (int) $user['id']);
 
         header('Location: index.php?page=notes&action=list');
         exit;

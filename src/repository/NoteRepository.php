@@ -12,16 +12,25 @@ class NoteRepository
     {
     }
 
-    public function findAll(): array
+    public function findAllByUserId(int $userId): array
     {
-        $sql = 'SELECT * FROM notes ORDER BY created_at DESC';
-        return $this->pdo->query($sql)->fetchAll();
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM notes WHERE user_id = :user_id ORDER BY created_at DESC'
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        return $stmt->fetchAll() ?: [];
     }
 
-    public function find(int $id): ?array
+    public function findByIdAndUserId(int $id, int $userId): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM notes WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM notes WHERE id = :id AND user_id = :user_id'
+        );
+        $stmt->execute([
+            'id' => $id,
+            'user_id' => $userId,
+        ]);
 
         return $stmt->fetch() ?: null;
     }
@@ -50,20 +59,38 @@ class NoteRepository
              SET title = :title,
                  content = :content,
                  is_shared = :is_shared
-             WHERE id = :id'
+             WHERE id = :id AND user_id = :user_id'
         );
 
         $stmt->execute([
             'id' => $note->getId(),
+            'user_id' => $note->getUserId(),
             'title' => $note->getTitle(),
             'content' => $note->getContent(),
             'is_shared' => $note->isShared() ? 1 : 0,
         ]);
     }
 
-    public function delete(int $id): void
+    public function delete(int $id, int $userId): void
     {
-        $stmt = $this->pdo->prepare('DELETE FROM notes WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $stmt = $this->pdo->prepare(
+            'DELETE FROM notes WHERE id = :id AND user_id = :user_id'
+        );
+        $stmt->execute([
+            'id' => $id,
+            'user_id' => $userId,
+        ]);
+    }
+
+    public function findSharedNotesByPatientId(int $patientId): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM notes
+             WHERE user_id = :user_id AND is_shared = 1
+             ORDER BY created_at DESC'
+        );
+        $stmt->execute(['user_id' => $patientId]);
+
+        return $stmt->fetchAll() ?: [];
     }
 }
