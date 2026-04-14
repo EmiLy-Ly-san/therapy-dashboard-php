@@ -30,8 +30,8 @@ function checkCsrf(): void
 }
 
 // paramètres de route
-$page = $_GET['page'] ?? 'notes';
-$action = $_GET['action'] ?? 'list';
+$page = $_GET['page'] ?? 'auth';
+$action = $_GET['action'] ?? 'login';
 $id = (int) ($_GET['id'] ?? 0);
 
 // Connexion BDD
