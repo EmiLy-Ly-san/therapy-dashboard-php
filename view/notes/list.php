@@ -5,6 +5,10 @@
     <title>Mes notes</title>
 </head>
 <body>
+  <p>
+    Bonjour <?= htmlspecialchars($_SESSION['user_name'] ?? '') ?> |
+    <a href="index.php?page=auth&action=logout">Déconnexion</a>
+  </p>
     <h1>Mes notes (<?= count($notes) ?>)</h1>
 
     <p>
