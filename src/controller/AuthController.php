@@ -37,11 +37,14 @@ class AuthController
         if ($name === '') {
             $errors['name'] = 'Le nom est requis';
         }
-
+        
+        /*filter_var : fonction PHP pour valider, filtrer des données*/
+        /*FILTER_VALIDATE_EMAIL: constante PHP utilisée avec filter_var pour vérifier format d’un email*/
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = 'Email invalide';
         }
 
+        /*vérifie longueur de la chaîne*/
         if (mb_strlen($password) < 8) {
             $errors['password'] = 'Minimum 8 caractères';
         }
@@ -59,7 +62,7 @@ class AuthController
         }
 
         if (empty($errors) && $this->userRepo->findByEmail($email)) {
-            $errors['email'] = 'Cet email est déjà utilisé';
+            $errors['email'] = 'Erreur lors de l’inscription';
         }
 
         $old = [
@@ -91,6 +94,7 @@ class AuthController
 
     public function login(): void
     {
+      // Si la requête est GET, on affiche le formulaire
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $error = null;
             $old = [];
@@ -98,6 +102,7 @@ class AuthController
             return;
         }
 
+        // Vérification du token CSRF pour sécuriser le formulaire
         checkCsrf();
 
         $email = trim($_POST['email'] ?? '');
@@ -105,7 +110,6 @@ class AuthController
 
         $user = $this->userRepo->findByEmail($email);
 
-        // Message volontairement vague
         if (!$user || !password_verify($password, $user['password'])) {
             $error = 'Email ou mot de passe incorrect';
             $old = ['email' => $email];
