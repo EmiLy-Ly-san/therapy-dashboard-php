@@ -51,7 +51,6 @@ class NoteController
         $user = Auth::currentUser();
 
         if ('POST' === $_SERVER['REQUEST_METHOD']) {
-            checkCsrf();
 
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
@@ -92,7 +91,6 @@ class NoteController
         }
 
         if ('POST' === $_SERVER['REQUEST_METHOD']) {
-            checkCsrf();
 
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');

@@ -28,7 +28,6 @@ class AuthController
             return;
         }
 
-        checkCsrf();
 
         $errors = [];
         $name = trim($_POST['name'] ?? '');
