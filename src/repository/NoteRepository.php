@@ -8,9 +8,7 @@ use App\Entity\Note;
 
 class NoteRepository
 {
-    public function __construct(private \PDO $pdo)
-    {
-    }
+    public function __construct(private \PDO $pdo) {}
 
     public function findAllByUserId(int $userId): array
     {

@@ -10,6 +10,7 @@ class Auth
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: index.php?page=auth&action=login');
+
             exit;
         }
     }
@@ -33,6 +34,7 @@ class Auth
 
         if (($_SESSION['role'] ?? '') !== $role) {
             http_response_code(403);
+
             exit('Accès interdit');
         }
     }

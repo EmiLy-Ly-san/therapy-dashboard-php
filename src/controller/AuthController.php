@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -18,10 +19,12 @@ class AuthController
     {
         $therapists = $this->userRepo->findTherapists();
 
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ('GET' === $_SERVER['REQUEST_METHOD']) {
             $errors = [];
             $old = [];
-            require __DIR__ . '/../../view/auth/register.php';
+
+            require __DIR__.'/../../view/auth/register.php';
+
             return;
         }
 
@@ -34,14 +37,17 @@ class AuthController
         $role = $_POST['role'] ?? 'patient';
         $therapistId = $_POST['therapist_id'] ?? '';
 
-        if ($name === '') {
+        if ('' === $name) {
             $errors['name'] = 'Le nom est requis';
         }
 
+        // filter_var : fonction PHP pour valider, filtrer des données
+        // FILTER_VALIDATE_EMAIL: constante PHP utilisée avec filter_var pour vérifier format d’un email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = 'Email invalide';
         }
 
+        // vérifie longueur de la chaîne
         if (mb_strlen($password) < 8) {
             $errors['password'] = 'Minimum 8 caractères';
         }
@@ -50,8 +56,8 @@ class AuthController
             $errors['role'] = 'Rôle invalide';
         }
 
-        if ($role === 'patient') {
-            if ($therapistId === '') {
+        if ('patient' === $role) {
+            if ('' === $therapistId) {
                 $errors['therapist_id'] = 'Veuillez choisir un thérapeute';
             } elseif (!$this->userRepo->findById((int) $therapistId)) {
                 $errors['therapist_id'] = 'Thérapeute invalide';
@@ -59,7 +65,7 @@ class AuthController
         }
 
         if (empty($errors) && $this->userRepo->findByEmail($email)) {
-            $errors['email'] = 'Cet email est déjà utilisé';
+            $errors['email'] = 'Erreur lors de l’inscription';
         }
 
         $old = [
@@ -70,7 +76,8 @@ class AuthController
         ];
 
         if (!empty($errors)) {
-            require __DIR__ . '/../../view/auth/register.php';
+            require __DIR__.'/../../view/auth/register.php';
+
             return;
         }
 
@@ -81,23 +88,28 @@ class AuthController
             'email' => $email,
             'password' => $hash,
             'role' => $role,
-            'therapist_id' => $role === 'patient' ? (int) $therapistId : null,
+            'therapist_id' => 'patient' === $role ? (int) $therapistId : null,
         ]);
 
         $_SESSION['flash'] = 'Inscription réussie ! Connectez-vous.';
         header('Location: index.php?page=auth&action=login');
+
         exit;
     }
 
     public function login(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        // Si la requête est GET, on affiche le formulaire
+        if ('GET' === $_SERVER['REQUEST_METHOD']) {
             $error = null;
             $old = [];
-            require __DIR__ . '/../../view/auth/login.php';
+
+            require __DIR__.'/../../view/auth/login.php';
+
             return;
         }
 
+        // Vérification du token CSRF pour sécuriser le formulaire
         checkCsrf();
 
         $email = trim($_POST['email'] ?? '');
@@ -105,11 +117,12 @@ class AuthController
 
         $user = $this->userRepo->findByEmail($email);
 
-        // Message volontairement vague
         if (!$user || !password_verify($password, $user['password'])) {
             $error = 'Email ou mot de passe incorrect';
             $old = ['email' => $email];
-            require __DIR__ . '/../../view/auth/login.php';
+
+            require __DIR__.'/../../view/auth/login.php';
+
             return;
         }
 
@@ -120,12 +133,14 @@ class AuthController
         $_SESSION['role'] = $user['role'];
 
         // Redirection selon rôle
-        if ($user['role'] === 'therapist') {
+        if ('therapist' === $user['role']) {
             header('Location: index.php?page=therapist&action=dashboard');
+
             exit;
         }
 
         header('Location: index.php?page=notes&action=list');
+
         exit;
     }
 
@@ -150,6 +165,7 @@ class AuthController
         session_destroy();
 
         header('Location: index.php?page=auth&action=login');
+
         exit;
     }
 }

@@ -27,7 +27,7 @@ class TherapistController
         $user = Auth::currentUser();
         $patients = $this->userRepository->findPatientsByTherapistId((int) $user['id']);
 
-        require __DIR__ . '/../../view/therapist/dashboard.php';
+        require __DIR__.'/../../view/therapist/dashboard.php';
     }
 
     /** voir les notes partagées d'un patient */
@@ -45,11 +45,12 @@ class TherapistController
         if (!$patient) {
             http_response_code(404);
             echo 'Patient non trouvé';
+
             return;
         }
 
         $notes = $this->noteRepository->findSharedNotesByPatientId($patientId);
 
-        require __DIR__ . '/../../view/therapist/patient-notes.php';
+        require __DIR__.'/../../view/therapist/patient-notes.php';
     }
 }

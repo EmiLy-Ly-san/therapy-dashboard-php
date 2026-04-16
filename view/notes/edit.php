@@ -14,7 +14,7 @@
                 type="text"
                 id="title"
                 name="title"
-                value="<?= htmlspecialchars($note['title']) ?>"
+                value="<?php echo htmlspecialchars($note['title']); ?>"
                 required
             >
         </div>
@@ -29,7 +29,7 @@
                 rows="8"
                 cols="60"
                 required
-            ><?= htmlspecialchars($note['content']) ?></textarea>
+            ><?php echo htmlspecialchars($note['content']); ?></textarea>
         </div>
 
         <br>
@@ -39,7 +39,7 @@
                 <input
                     type="checkbox"
                     name="is_shared"
-                    <?= $note['is_shared'] ? 'checked' : '' ?>
+                    <?php echo $note['is_shared'] ? 'checked' : ''; ?>
                 >
                 Partager avec le thérapeute
             </label>

@@ -24,7 +24,7 @@ class NoteController
         $user = Auth::currentUser();
         $notes = $this->repository->findAllByUserId((int) $user['id']);
 
-        require __DIR__ . '/../../view/notes/list.php';
+        require __DIR__.'/../../view/notes/list.php';
     }
 
     public function show(int $id): void
@@ -37,10 +37,11 @@ class NoteController
         if (!$note) {
             http_response_code(404);
             echo 'Note non trouvée';
+
             return;
         }
 
-        require __DIR__ . '/../../view/notes/show.php';
+        require __DIR__.'/../../view/notes/show.php';
     }
 
     public function create(): void
@@ -49,14 +50,14 @@ class NoteController
 
         $user = Auth::currentUser();
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ('POST' === $_SERVER['REQUEST_METHOD']) {
             checkCsrf();
 
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
             $isShared = isset($_POST['is_shared']);
 
-            if ($title !== '' && $content !== '') {
+            if ('' !== $title && '' !== $content) {
                 $note = new Note(
                     null,
                     (int) $user['id'],
@@ -68,11 +69,12 @@ class NoteController
                 $this->repository->save($note);
 
                 header('Location: index.php?page=notes&action=list');
+
                 exit;
             }
         }
 
-        require __DIR__ . '/../../view/notes/create.php';
+        require __DIR__.'/../../view/notes/create.php';
     }
 
     public function update(int $id): void
@@ -85,17 +87,18 @@ class NoteController
         if (!$note) {
             http_response_code(404);
             echo 'Note non trouvée';
+
             return;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ('POST' === $_SERVER['REQUEST_METHOD']) {
             checkCsrf();
 
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
             $isShared = isset($_POST['is_shared']);
 
-            if ($title !== '' && $content !== '') {
+            if ('' !== $title && '' !== $content) {
                 $updatedNote = new Note(
                     $id,
                     (int) $user['id'],
@@ -107,11 +110,12 @@ class NoteController
                 $this->repository->update($updatedNote);
 
                 header('Location: index.php?page=notes&action=list');
+
                 exit;
             }
         }
 
-        require __DIR__ . '/../../view/notes/edit.php';
+        require __DIR__.'/../../view/notes/edit.php';
     }
 
     public function delete(int $id): void
@@ -124,12 +128,14 @@ class NoteController
         if (!$note) {
             http_response_code(404);
             echo 'Note non trouvée';
+
             return;
         }
 
         $this->repository->delete($id, (int) $user['id']);
 
         header('Location: index.php?page=notes&action=list');
+
         exit;
     }
 }
