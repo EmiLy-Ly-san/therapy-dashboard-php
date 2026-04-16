@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 function getConnection(): PDO
@@ -8,7 +9,7 @@ function getConnection(): PDO
     $username = 'root';
     $password = 'root';
 
-    $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+    $dsn = "mysql:host={$host};dbname={$dbname};charset=utf8mb4";
 
     return new PDO($dsn, $username, $password, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

@@ -44,22 +44,22 @@
 <body>
     <h1>Connexion</h1>
 
-    <?php if (isset($_SESSION['flash'])): ?>
+    <?php if (isset($_SESSION['flash'])) { ?>
         <div class="flash">
-            <?= htmlspecialchars($_SESSION['flash']) ?>
+            <?php echo htmlspecialchars($_SESSION['flash']); ?>
         </div>
         <?php unset($_SESSION['flash']); ?>
-    <?php endif; ?>
+    <?php } ?>
 
-    <?php if (!empty($error)): ?>
-        <p class="error"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+    <?php if (!empty($error)) { ?>
+        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+    <?php } ?>
 
     <form method="POST" action="index.php?page=auth&action=login">
         <input
             type="hidden"
             name="csrf_token"
-            value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>"
+            value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>"
         >
 
         <label>
@@ -67,7 +67,7 @@
             <input
                 type="email"
                 name="email"
-                value="<?= htmlspecialchars($old['email'] ?? '') ?>"
+                value="<?php echo htmlspecialchars($old['email'] ?? ''); ?>"
             >
         </label>
 

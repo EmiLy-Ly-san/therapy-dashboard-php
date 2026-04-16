@@ -1,15 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Repository;
 
-use PDO;
-
 class UserRepository
 {
-    private PDO $pdo;
+    private \PDO $pdo;
 
-    public function __construct(PDO $pdo)
+    public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
     }
@@ -17,11 +16,11 @@ class UserRepository
     /** Trouver un utilisateur par email (login) */
     public function findByEmail(string $email): ?array
     {
-        $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
+        $sql = 'SELECT * FROM users WHERE email = :email LIMIT 1';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['email' => $email]);
 
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         return $user ?: null;
     }
@@ -29,11 +28,11 @@ class UserRepository
     /** Trouver un utilisateur par ID */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT * FROM users WHERE id = :id LIMIT 1";
+        $sql = 'SELECT * FROM users WHERE id = :id LIMIT 1';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
 
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         return $user ?: null;
     }
@@ -41,10 +40,10 @@ class UserRepository
     /** Créer un utilisateur */
     public function create(array $data): void
     {
-        $sql = "
+        $sql = '
             INSERT INTO users (name, email, password, role, therapist_id)
             VALUES (:name, :email, :password, :role, :therapist_id)
-        ";
+        ';
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -63,11 +62,11 @@ class UserRepository
         $sql = "SELECT id, name FROM users WHERE role = 'therapist' ORDER BY name";
         $stmt = $this->pdo->query($sql);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
-     * Récupérer les patients d'un therapist
+     * Récupérer les patients d'un therapist.
      */
     public function findPatientsByTherapistId(int $therapistId): array
     {
@@ -81,7 +80,7 @@ class UserRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['therapist_id' => $therapistId]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /** Trouver un patient appartenant à un therapist */
@@ -102,7 +101,7 @@ class UserRepository
             'therapist_id' => $therapistId,
         ]);
 
-        $patient = $stmt->fetch(PDO::FETCH_ASSOC);
+        $patient = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         return $patient ?: null;
     }

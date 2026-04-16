@@ -44,18 +44,18 @@
 <body>
     <h1>Inscription</h1>
 
-    <?php if (isset($_SESSION['flash'])): ?>
+    <?php if (isset($_SESSION['flash'])) { ?>
         <div class="flash">
-            <?= htmlspecialchars($_SESSION['flash']) ?>
+            <?php echo htmlspecialchars($_SESSION['flash']); ?>
         </div>
         <?php unset($_SESSION['flash']); ?>
-    <?php endif; ?>
+    <?php } ?>
 
     <form method="POST" action="index.php?page=auth&action=register">
         <input
             type="hidden"
             name="csrf_token"
-            value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>"
+            value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>"
         >
 
         <label>
@@ -63,11 +63,11 @@
             <input
                 type="text"
                 name="name"
-                value="<?= htmlspecialchars($old['name'] ?? '') ?>"
+                value="<?php echo htmlspecialchars($old['name'] ?? ''); ?>"
             >
-            <?php if (isset($errors['name'])): ?>
-                <div class="error"><?= htmlspecialchars($errors['name']) ?></div>
-            <?php endif; ?>
+            <?php if (isset($errors['name'])) { ?>
+                <div class="error"><?php echo htmlspecialchars($errors['name']); ?></div>
+            <?php } ?>
         </label>
 
         <label>
@@ -75,11 +75,11 @@
             <input
                 type="email"
                 name="email"
-                value="<?= htmlspecialchars($old['email'] ?? '') ?>"
+                value="<?php echo htmlspecialchars($old['email'] ?? ''); ?>"
             >
-            <?php if (isset($errors['email'])): ?>
-                <div class="error"><?= htmlspecialchars($errors['email']) ?></div>
-            <?php endif; ?>
+            <?php if (isset($errors['email'])) { ?>
+                <div class="error"><?php echo htmlspecialchars($errors['email']); ?></div>
+            <?php } ?>
         </label>
 
         <label>
@@ -88,42 +88,42 @@
                 type="password"
                 name="password"
             >
-            <?php if (isset($errors['password'])): ?>
-                <div class="error"><?= htmlspecialchars($errors['password']) ?></div>
-            <?php endif; ?>
+            <?php if (isset($errors['password'])) { ?>
+                <div class="error"><?php echo htmlspecialchars($errors['password']); ?></div>
+            <?php } ?>
         </label>
 
         <label>
             Rôle
             <select name="role" id="role-select">
-                <option value="patient" <?= (($old['role'] ?? 'patient') === 'patient') ? 'selected' : '' ?>>
+                <option value="patient" <?php echo (($old['role'] ?? 'patient') === 'patient') ? 'selected' : ''; ?>>
                     Patient
                 </option>
-                <option value="therapist" <?= (($old['role'] ?? '') === 'therapist') ? 'selected' : '' ?>>
+                <option value="therapist" <?php echo (($old['role'] ?? '') === 'therapist') ? 'selected' : ''; ?>>
                     Thérapeute
                 </option>
             </select>
-            <?php if (isset($errors['role'])): ?>
-                <div class="error"><?= htmlspecialchars($errors['role']) ?></div>
-            <?php endif; ?>
+            <?php if (isset($errors['role'])) { ?>
+                <div class="error"><?php echo htmlspecialchars($errors['role']); ?></div>
+            <?php } ?>
         </label>
 
         <label id="therapist-field">
             Thérapeute associé
             <select name="therapist_id">
                 <option value="">-- Choisir un thérapeute --</option>
-                <?php foreach ($therapists as $therapist): ?>
+                <?php foreach ($therapists as $therapist) { ?>
                     <option
-                        value="<?= (int) $therapist['id'] ?>"
-                        <?= (($old['therapist_id'] ?? '') == $therapist['id']) ? 'selected' : '' ?>
+                        value="<?php echo (int) $therapist['id']; ?>"
+                        <?php echo (($old['therapist_id'] ?? '') == $therapist['id']) ? 'selected' : ''; ?>
                     >
-                        <?= htmlspecialchars($therapist['name']) ?>
+                        <?php echo htmlspecialchars($therapist['name']); ?>
                     </option>
-                <?php endforeach; ?>
+                <?php } ?>
             </select>
-            <?php if (isset($errors['therapist_id'])): ?>
-                <div class="error"><?= htmlspecialchars($errors['therapist_id']) ?></div>
-            <?php endif; ?>
+            <?php if (isset($errors['therapist_id'])) { ?>
+                <div class="error"><?php echo htmlspecialchars($errors['therapist_id']); ?></div>
+            <?php } ?>
         </label>
 
         <button type="submit">S'inscrire</button>

@@ -12,8 +12,7 @@ class Note
         private string $title,
         private string $content,
         private bool $isShared
-    ) {
-    }
+    ) {}
 
     public function getId(): ?int
     {

@@ -30,7 +30,7 @@
 <body>
     <div class="topbar">
         <p>
-            Bonjour <?= htmlspecialchars($_SESSION['user_name'] ?? '') ?> |
+            Bonjour <?php echo htmlspecialchars($_SESSION['user_name'] ?? ''); ?> |
             <a href="index.php?page=auth&action=logout">Déconnexion</a>
         </p>
 
@@ -39,21 +39,21 @@
         </p>
     </div>
 
-    <h1>Notes partagées de <?= htmlspecialchars($patient['name']) ?></h1>
+    <h1>Notes partagées de <?php echo htmlspecialchars($patient['name']); ?></h1>
 
-    <?php if (empty($notes)): ?>
+    <?php if (empty($notes)) { ?>
         <p>Aucune note partagée pour ce patient.</p>
-    <?php else: ?>
-        <?php foreach ($notes as $note): ?>
+    <?php } else { ?>
+        <?php foreach ($notes as $note) { ?>
             <div class="note-card">
-                <h2><?= htmlspecialchars($note['title']) ?></h2>
-                <p><?= nl2br(htmlspecialchars($note['content'])) ?></p>
+                <h2><?php echo htmlspecialchars($note['title']); ?></h2>
+                <p><?php echo nl2br(htmlspecialchars($note['content'])); ?></p>
                 <p class="meta">
-                    Partagée : <?= $note['is_shared'] ? 'Oui' : 'Non' ?> |
-                    Créée le : <?= htmlspecialchars($note['created_at']) ?>
+                    Partagée : <?php echo $note['is_shared'] ? 'Oui' : 'Non'; ?> |
+                    Créée le : <?php echo htmlspecialchars($note['created_at']); ?>
                 </p>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+        <?php } ?>
+    <?php } ?>
 </body>
 </html>
